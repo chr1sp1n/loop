@@ -4,7 +4,7 @@ namespace Udp;
 
 class Broadcast{
 
-	private $sock;
+	private $sock = null;
 	private $verbose;
 	private $broadcast_ip;
 	private $port;
@@ -13,12 +13,15 @@ class Broadcast{
 		$this->verbose = $verbose;
 		$this->broadcast_ip = $broadcast_ip;
 		$this->port = $port;
+		//$this->init();
 	}
 
 	public function __destruct(){
-		\socket_shutdown($this->sock);
-		\socket_close($this->sock);
+		if($this->sock){
+			\socket_close($this->sock);
+		}
 	}
+
 
 	public function getError(){
 		$error = new \stdClass();

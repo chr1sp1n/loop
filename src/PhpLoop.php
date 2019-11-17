@@ -6,8 +6,15 @@ class PhpLoop {
 
 	protected $tasks = [];
 	protected $listners = [];
+	protected $eventsCallbacks = [];
 
 	public function __construct(){	
+		// if (function_exists('pcntl_signal')){
+		// 	pcntl_signal(SIGINT, function(){
+		// 		echo "Test";
+		// 		$this->trigger('SIGINT');
+		// 	});
+		// }
 	}
 
 	public function addTask(string $name, $function){
@@ -21,15 +28,21 @@ class PhpLoop {
 		return true;
 	}
 
-	public function addListner(string $name, $function){
-		if(array_key_exists($name, $this->listners)) return false;
-		return $this->listners[$name] = $function;
+	public function on(string $callbackName, $callback){
+		if(!isset($eventsCallbacks[$callbackName])) $eventsCallbacks[$callbackName] = [];
+		$eventsCallbacks[$callbackName][] = $callback;
 	}
 
-	public function removeListner(string $name){
-		if(!array_key_exists($name, $this->listners)) return false;
-		unset($this->tasks[$name]);
-		return true;
+	public function trigger($eventName, $args = null){
+		if(isset($eventsCallbacks[$eventName]) && !empty($eventsCallbacks[$eventName])){
+			foreach ($eventsCallbacks[$eventName] as $function) {
+				if($args){
+					$function($eventName, $args);
+				}else{
+					$function($eventName);
+				}
+			}
+		}
 	}
 
 	public function run(){
